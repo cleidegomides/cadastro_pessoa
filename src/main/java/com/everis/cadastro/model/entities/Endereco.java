@@ -1,4 +1,4 @@
-package com.everis.cadastro.entities;
+package com.everis.cadastro.model.entities;
 
 import lombok.Data;
 

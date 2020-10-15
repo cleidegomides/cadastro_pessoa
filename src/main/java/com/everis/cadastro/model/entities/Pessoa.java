@@ -1,4 +1,4 @@
-package com.everis.cadastro.entities;
+package com.everis.cadastro.model.entities;
 
 import lombok.Data;
 
@@ -15,8 +15,8 @@ public class Pessoa {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nome;
+    private String nomeCompleto;
 
-    @OneToMany
-    List<Endereco> enderecos = new ArrayList<>();
+    @ManyToMany
+    private List<Endereco> enderecos;
 }

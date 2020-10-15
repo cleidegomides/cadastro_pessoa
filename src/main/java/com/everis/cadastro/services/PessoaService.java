@@ -1,34 +1,22 @@
 package com.everis.cadastro.services;
 
-import com.everis.cadastro.dto.PessoaDto;
-import com.everis.cadastro.entities.Pessoa;
-import com.everis.cadastro.exceptions.PessoaNotFoundException;
-import com.everis.cadastro.mappers.MapperPessoaPessoaDto;
-import com.everis.cadastro.repositories.PessoaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.everis.cadastro.model.dto.PessoaDto;
 
 import java.util.List;
 
-@Service
-public class PessoaService {
+public interface PessoaService {
 
-    @Autowired
-    private PessoaRepository pessoaRepository;
+    PessoaDto create(PessoaDto pessoaDto);
 
-    @Autowired
-    private MapperPessoaPessoaDto mapperPessoaPessoaDto;
+    List<PessoaDto> get();
 
+    PessoaDto get(Long id);
 
-    public PessoaDto criarCadastroPessoa(PessoaDto pessoaDto){
-        List<Pessoa> pessoas = pessoaRepository.findAll();
+    void delete(Long id);
 
-        if (pessoas == null){
-            throw new PessoaNotFoundException("Pessoa não encontrada.");
-        }
+    PessoaDto update(PessoaDto pessoaDto);
 
-        Pessoa pessoa = mapperPessoaPessoaDto.toEntity(pessoaDto);
-        pessoaRepository.save(pessoa);
-        return pessoaDto;
-    }
+    PessoaDto addAdress(Long idEndereco, Long idPessoa);
+
+    PessoaDto removeAdress(Long idEndereco, Long idPessoa);
 }
