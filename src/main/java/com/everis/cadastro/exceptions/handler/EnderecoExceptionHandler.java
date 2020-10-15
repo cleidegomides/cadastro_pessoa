@@ -1,4 +1,4 @@
-package com.everis.cadastro.handler;
+package com.everis.cadastro.exceptions.handler;
 
 import com.everis.cadastro.exceptions.EnderecoNotFoundException;
 import com.everis.cadastro.exceptions.erro.EnderecoNotFoundDetails;
