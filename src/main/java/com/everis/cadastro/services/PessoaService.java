@@ -8,9 +8,9 @@ public interface PessoaService {
 
     PessoaDto create(PessoaDto pessoaDto);
 
-    List<PessoaDto> get();
+    List<PessoaDto> buscarPessoas();
 
-    PessoaDto get(Long id);
+    PessoaDto buscarPessoaPorId(Long id);
 
     void delete(Long id);
 

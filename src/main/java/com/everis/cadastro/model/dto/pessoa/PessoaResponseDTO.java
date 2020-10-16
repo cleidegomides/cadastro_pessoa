@@ -1,6 +1,6 @@
-package com.everis.cadastro.model.dto;
+package com.everis.cadastro.model.dto.pessoa;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.everis.cadastro.model.dto.EnderecoDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,8 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class PessoaDto {
+public class PessoaResponseDTO {
 
     private Long id;
     private String nomeCompleto;

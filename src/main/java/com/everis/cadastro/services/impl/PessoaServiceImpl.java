@@ -1,138 +1,98 @@
 package com.everis.cadastro.services.impl;
 
-import com.everis.cadastro.exceptions.EnderecoNotFoundException;
+import com.everis.cadastro.exceptions.PessoaCreateException;
 import com.everis.cadastro.exceptions.PessoaNotFoundException;
 import com.everis.cadastro.mappers.MapperPessoaPessoaDto;
 import com.everis.cadastro.model.dto.PessoaDto;
-import com.everis.cadastro.model.entities.Endereco;
 import com.everis.cadastro.model.entities.Pessoa;
-import com.everis.cadastro.repositories.EnderecoRepository;
 import com.everis.cadastro.repositories.PessoaRepository;
+import com.everis.cadastro.services.EnderecoService;
 import com.everis.cadastro.services.PessoaService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.Optional.of;
+
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class PessoaServiceImpl implements PessoaService {
 
-    @Autowired
-    private PessoaRepository pessoaRepository;
-
-    @Autowired
-    private EnderecoRepository enderecoRepository;
-
-    @Autowired
-    private MapperPessoaPessoaDto mapperPessoaPessoaDto;
+    private final PessoaRepository pessoaRepository;
+    private final EnderecoService enderecoService;
+    private final MapperPessoaPessoaDto mapperPessoaPessoaDto;
 
     @Override
-    public PessoaDto create(PessoaDto pessoaDto) {
-        Pessoa pessoa = mapperPessoaPessoaDto.toEntity(pessoaDto);
-
-        pessoa = pessoaRepository.save(pessoa);
-
-        PessoaDto pessoaDto1 = mapperPessoaPessoaDto.toDto(pessoa);
-
-        return pessoaDto1;
+    public PessoaDto create(final PessoaDto pessoaDto) {
+        return of(mapperPessoaPessoaDto.toEntity(pessoaDto))
+                .map(pessoaRepository::save)
+                .map(mapperPessoaPessoaDto::toDto)
+                .orElseThrow(() -> new PessoaCreateException("Falha ao criar a pessoa: " + pessoaDto));
     }
 
     @Override
-    public List<PessoaDto> get() {
-        List<Pessoa> pessoas = pessoaRepository.findAll();
-
-        List<PessoaDto> pessoaDtos = pessoas
+    public List<PessoaDto> buscarPessoas() {
+        return pessoaRepository.findAll()
                 .stream()
                 .map(pessoa -> {
+                    log.info("Pessoa: {}", pessoa);
                     return mapperPessoaPessoaDto.toDto(pessoa);
                 })
                 .collect(Collectors.toList());
-
-        return pessoaDtos;
     }
 
     @Override
-    public PessoaDto get(Long id) {
-        Optional<Pessoa> optionalPessoa = pessoaRepository.findById(id);
-
-        Pessoa pessoa = optionalPessoa
-                            .orElseThrow(() -> new PessoaNotFoundException("Pessoa não encontrada para o id..") );
-
-        PessoaDto pessoaDto = mapperPessoaPessoaDto.toDto(pessoa);
-
-        return pessoaDto;
+    public PessoaDto buscarPessoaPorId(final Long id) {
+       return mapperPessoaPessoaDto.toDto(getPessoa(id));
     }
 
     @Override
-    public void delete(Long id) {
-        Optional<Pessoa> optionalPessoa = pessoaRepository.findById(id);
-
-        Pessoa pessoa = optionalPessoa
-                .orElseThrow(() -> new PessoaNotFoundException("Pessoa não encontrada para o id."));
-
-        pessoaRepository.delete(pessoa);
+    public void delete(final Long id) {
+        try {
+            pessoaRepository.deleteById(id);
+        } catch (Exception e) {
+            log.error("Falha ao deletar a pessoa com id: {}.", id);
+        }
     }
 
     @Override
-    public PessoaDto update(PessoaDto pessoaDto) {
-        Optional<Pessoa> optionalPessoa = pessoaRepository.findById(pessoaDto.getId());
-
-        Pessoa pessoa = optionalPessoa
+    public PessoaDto update(final PessoaDto pessoaDto) {
+        return pessoaRepository.findById(pessoaDto.getId())
+                .map(pessoa -> {
+                    mapperPessoaPessoaDto.toEntityUpdate(pessoaDto, pessoa);
+                    return pessoa;
+                })
+                .map(pessoaRepository::save)
+                .map(mapperPessoaPessoaDto::toDto)
                 .orElseThrow(() -> new PessoaNotFoundException("Pessoa não encontrada para o id.."));
-
-        mapperPessoaPessoaDto.toEntityUpdate(pessoaDto, pessoa);
-
-        pessoaRepository.save(pessoa);
-
-        PessoaDto pessoaDto1 = mapperPessoaPessoaDto.toDto(pessoa);
-
-        return pessoaDto1;
     }
 
     @Override
-    public PessoaDto addAdress(Long idEndereco, Long idPessoa) {
-       Pessoa pessoa = pessoaRepository.findById(idPessoa).get();
-
-       if(pessoa == null){
-           throw new PessoaNotFoundException("Pessoa não encontrada para o id.");
-       }
-
-       Endereco endereco = enderecoRepository.findById(idEndereco).get();
-
-       if(endereco == null){
-           throw new EnderecoNotFoundException("Endereço não encontrado");
-       }
-
-       pessoa.getEnderecos().add(endereco);
-
-       pessoaRepository.save(pessoa);
-
-       PessoaDto pessoaDto = mapperPessoaPessoaDto.toDto(pessoa);
-
-       return pessoaDto;
+    public PessoaDto addAdress(final Long idEndereco, final Long idPessoa) {
+        return of(getPessoa(idPessoa))
+                .map(p -> {
+                    p.adicionarEndereco(enderecoService.getEndereco(idEndereco));
+                    return pessoaRepository.save(p);
+                }).map(mapperPessoaPessoaDto::toDto)
+                .orElseThrow(RuntimeException::new);
     }
 
     @Override
-    public PessoaDto removeAdress(Long idEndereco, Long idPessoa) {
-        Pessoa pessoa = pessoaRepository.findById(idPessoa).get();
+    public PessoaDto removeAdress(final Long idEndereco, final Long idPessoa) {
+        return of(getPessoa(idPessoa))
+                .map(p -> {
+                    p.removerEndereco(enderecoService.getEndereco(idEndereco));
+                    return pessoaRepository.save(p);
+                }).map(mapperPessoaPessoaDto::toDto)
+                .orElseThrow(RuntimeException::new);
+    }
 
-        if(pessoa == null){
-            throw new PessoaNotFoundException("Pessoa não encontrada para o id.");
-        }
-
-        for (Endereco endereco : pessoa.getEnderecos()) {
-            if(endereco.getId().equals(idEndereco)){
-                pessoa.getEnderecos().remove(endereco);
-                break;
-            }
-        }
-
-        pessoaRepository.save(pessoa);
-
-        PessoaDto pessoaDto = mapperPessoaPessoaDto.toDto(pessoa);
-
-        return pessoaDto;
+    private Pessoa getPessoa(final Long id) {
+        return pessoaRepository.findById(id)
+                .orElseThrow(() -> new PessoaNotFoundException("Pessoa não encontrada para o id.."));
     }
 }

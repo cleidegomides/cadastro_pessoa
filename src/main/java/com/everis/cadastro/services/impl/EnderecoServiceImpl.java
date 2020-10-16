@@ -84,4 +84,10 @@ public class EnderecoServiceImpl implements EnderecoService {
 
         return enderecoDto1;
     }
+
+    @Override
+    public Endereco getEndereco(Long id) {
+        return enderecoRepository.findById(id)
+                .orElseThrow(() -> new EnderecoNotFoundException("Endereço não encontrado para esse Id."));
+    }
 }
