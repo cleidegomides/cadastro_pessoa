@@ -1,21 +1,21 @@
 package com.everis.cadastro.services;
 
-import com.everis.cadastro.model.dto.EnderecoDto;
+import com.everis.cadastro.model.dto.endereco.EnderecoRequestDTO;
+import com.everis.cadastro.model.dto.endereco.EnderecoResponseDTO;
 import com.everis.cadastro.model.entities.Endereco;
-
 import java.util.List;
 
 public interface EnderecoService {
 
-    EnderecoDto create(EnderecoDto enderecoDto);
+    EnderecoResponseDTO create(EnderecoRequestDTO enderecoRequestDTO);
 
-    List<EnderecoDto> get();
+    EnderecoResponseDTO get(Long id);
 
-    EnderecoDto get(Long id);
+    List<EnderecoResponseDTO> get();
 
     void delete(Long id);
 
-    EnderecoDto update(EnderecoDto enderecoDto);
+    EnderecoResponseDTO update(EnderecoRequestDTO enderecoRequestDTO);
 
     Endereco getEndereco(final Long id);
 }

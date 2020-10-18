@@ -1,22 +1,22 @@
 package com.everis.cadastro.services;
-
-import com.everis.cadastro.model.dto.PessoaDto;
+import com.everis.cadastro.model.dto.pessoa.PessoaRequestDTO;
+import com.everis.cadastro.model.dto.pessoa.PessoaResponseDTO;
 
 import java.util.List;
 
 public interface PessoaService {
 
-    PessoaDto create(PessoaDto pessoaDto);
+    PessoaResponseDTO create(PessoaRequestDTO pessoaRequestDTO);
 
-    List<PessoaDto> buscarPessoas();
+    List<PessoaResponseDTO> buscarPessoas();
 
-    PessoaDto buscarPessoaPorId(Long id);
+    PessoaResponseDTO buscarPessoaPorId(Long id);
 
     void delete(Long id);
 
-    PessoaDto update(PessoaDto pessoaDto);
+    PessoaResponseDTO update(PessoaRequestDTO pessoaDto);
 
-    PessoaDto addAdress(Long idEndereco, Long idPessoa);
+    PessoaResponseDTO addAdress(Long idEndereco, Long idPessoa);
 
-    PessoaDto removeAdress(Long idEndereco, Long idPessoa);
+    PessoaResponseDTO removeAdress(Long idEndereco, Long idPessoa);
 }

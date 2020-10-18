@@ -2,20 +2,22 @@ package com.everis.cadastro.services.impl;
 
 import com.everis.cadastro.exceptions.PessoaCreateException;
 import com.everis.cadastro.exceptions.PessoaNotFoundException;
-import com.everis.cadastro.mappers.MapperPessoaPessoaDto;
-import com.everis.cadastro.model.dto.PessoaDto;
+import com.everis.cadastro.mappers.MapperPessoaPessoaRequestDTO;
+import com.everis.cadastro.mappers.MapperPessoaPessoaResponseDTO;
+import com.everis.cadastro.model.dto.pessoa.PessoaRequestDTO;
+import com.everis.cadastro.model.dto.pessoa.PessoaResponseDTO;
 import com.everis.cadastro.model.entities.Pessoa;
 import com.everis.cadastro.repositories.PessoaRepository;
 import com.everis.cadastro.services.EnderecoService;
 import com.everis.cadastro.services.PessoaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static java.util.Optional.of;
 
 @Service
 @Slf4j
@@ -24,30 +26,34 @@ public class PessoaServiceImpl implements PessoaService {
 
     private final PessoaRepository pessoaRepository;
     private final EnderecoService enderecoService;
-    private final MapperPessoaPessoaDto mapperPessoaPessoaDto;
+    private final MapperPessoaPessoaRequestDTO mapperPessoaPessoaRequestDTO;
+    private final MapperPessoaPessoaResponseDTO mapperPessoaPessoaResponseDTO;
 
     @Override
-    public PessoaDto create(final PessoaDto pessoaDto) {
-        return of(mapperPessoaPessoaDto.toEntity(pessoaDto))
-                .map(pessoaRepository::save)
-                .map(mapperPessoaPessoaDto::toDto)
-                .orElseThrow(() -> new PessoaCreateException("Falha ao criar a pessoa: " + pessoaDto));
+    public PessoaResponseDTO create(final PessoaRequestDTO pessoaRequestDTO) {
+        return Optional
+                .of( mapperPessoaPessoaRequestDTO.toEntity(pessoaRequestDTO) )
+                .map( pessoaRepository::save )
+                .map( mapperPessoaPessoaResponseDTO::toDto )
+                .orElseThrow(
+                        () -> new PessoaCreateException("Falha ao criar a pessoa: " + pessoaRequestDTO))
+                ;
     }
 
     @Override
-    public List<PessoaDto> buscarPessoas() {
+    public List<PessoaResponseDTO> buscarPessoas() {
         return pessoaRepository.findAll()
                 .stream()
                 .map(pessoa -> {
                     log.info("Pessoa: {}", pessoa);
-                    return mapperPessoaPessoaDto.toDto(pessoa);
+                    return mapperPessoaPessoaResponseDTO.toDto(pessoa);
                 })
                 .collect(Collectors.toList());
     }
 
     @Override
-    public PessoaDto buscarPessoaPorId(final Long id) {
-       return mapperPessoaPessoaDto.toDto(getPessoa(id));
+    public PessoaResponseDTO buscarPessoaPorId(final Long id) {
+       return mapperPessoaPessoaResponseDTO.toDto(getPessoa(id));
     }
 
     @Override
@@ -60,34 +66,35 @@ public class PessoaServiceImpl implements PessoaService {
     }
 
     @Override
-    public PessoaDto update(final PessoaDto pessoaDto) {
-        return pessoaRepository.findById(pessoaDto.getId())
+    public PessoaResponseDTO update(final PessoaRequestDTO pessoaRequestDTO) {
+        return pessoaRepository.findById(pessoaRequestDTO.getId())
                 .map(pessoa -> {
-                    mapperPessoaPessoaDto.toEntityUpdate(pessoaDto, pessoa);
+                    mapperPessoaPessoaRequestDTO.toEntityUpdate(pessoaRequestDTO, pessoa);
                     return pessoa;
                 })
                 .map(pessoaRepository::save)
-                .map(mapperPessoaPessoaDto::toDto)
-                .orElseThrow(() -> new PessoaNotFoundException("Pessoa não encontrada para o id.."));
+                .map(mapperPessoaPessoaResponseDTO::toDto)
+                .orElseThrow(() -> new PessoaNotFoundException("Pessoa não encontrada para o id.."))
+                ;
     }
 
     @Override
-    public PessoaDto addAdress(final Long idEndereco, final Long idPessoa) {
-        return of(getPessoa(idPessoa))
+    public PessoaResponseDTO addAdress(final Long idEndereco, final Long idPessoa) {
+        return Optional.of(getPessoa(idPessoa))
                 .map(p -> {
                     p.adicionarEndereco(enderecoService.getEndereco(idEndereco));
                     return pessoaRepository.save(p);
-                }).map(mapperPessoaPessoaDto::toDto)
+                }).map(mapperPessoaPessoaResponseDTO::toDto)
                 .orElseThrow(RuntimeException::new);
     }
 
     @Override
-    public PessoaDto removeAdress(final Long idEndereco, final Long idPessoa) {
-        return of(getPessoa(idPessoa))
+    public PessoaResponseDTO removeAdress(final Long idEndereco, final Long idPessoa) {
+        return Optional.of(getPessoa(idPessoa))
                 .map(p -> {
                     p.removerEndereco(enderecoService.getEndereco(idEndereco));
                     return pessoaRepository.save(p);
-                }).map(mapperPessoaPessoaDto::toDto)
+                }).map(mapperPessoaPessoaResponseDTO::toDto)
                 .orElseThrow(RuntimeException::new);
     }
 

@@ -1,12 +1,14 @@
 package com.everis.cadastro.model.entities;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
+@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "TB_endereco")
 public class Endereco {
