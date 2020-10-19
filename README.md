@@ -17,8 +17,8 @@ ___
 
 - Java8
 - Spring Data
-_ Spring Boot
-_ Swagger2
+-  Spring Boot
+- Swagger2
 - Lombok
 - Mapstruct
 ___

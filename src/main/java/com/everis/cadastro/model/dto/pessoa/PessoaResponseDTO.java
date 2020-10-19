@@ -1,6 +1,5 @@
 package com.everis.cadastro.model.dto.pessoa;
 
-import com.everis.cadastro.model.dto.endereco.EnderecoRequestDTO;
 import com.everis.cadastro.model.dto.endereco.EnderecoResponseDTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

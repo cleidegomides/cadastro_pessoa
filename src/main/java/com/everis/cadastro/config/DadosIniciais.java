@@ -5,7 +5,6 @@ import com.everis.cadastro.model.entities.Pessoa;
 import com.everis.cadastro.repositories.EnderecoRepository;
 import com.everis.cadastro.repositories.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;

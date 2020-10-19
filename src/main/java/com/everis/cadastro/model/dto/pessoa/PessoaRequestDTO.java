@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PessoaRequestDTO {
     private Long id;
     private String nomeCompleto;

@@ -3,13 +3,13 @@ package com.everis.cadastro.controllers;
 import com.everis.cadastro.model.dto.pessoa.PessoaRequestDTO;
 import com.everis.cadastro.model.dto.pessoa.PessoaResponseDTO;
 import com.everis.cadastro.services.PessoaService;
-import com.everis.cadastro.services.impl.PessoaServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import java.net.URI;
 import java.util.List;
 
